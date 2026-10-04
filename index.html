@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="id"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>MPI Informatika – Struktur Data Tree</title>
+<style>
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;overflow:hidden}
+body{background:linear-gradient(rgba(240,249,255,.82),rgba(240,249,255,.82)),url('bg-ruang-kelas.jpg') center/cover no-repeat fixed #f0f9ff;font-family:'Trebuchet MS','Segoe UI',sans-serif;color:#1e293b;display:grid;place-items:center}
+#stage-16-9{--font-scale:1;width:min(100vw,calc(100vh*16/9));aspect-ratio:16/9;position:relative;background:transparent;border:none;box-shadow:none;border-radius:0;overflow:hidden;font-size:calc(15px*var(--font-scale))}
+.pg{position:absolute;inset:0;display:none;flex-direction:column;gap:1.2vh;padding:clamp(10px,1.8vh,18px);overflow:hidden}
+.pg.on{display:flex}
+.bar{display:flex;align-items:center;gap:10px}
+.pill{background:linear-gradient(90deg,#2563eb,#7c3aed);color:#fff;font-weight:800;font-size:clamp(16px,2.2vh,22px);padding:.5vh 22px;border-radius:30px;flex:1;box-shadow:0 4px 10px #2563eb44}
+.rb{width:clamp(40px,5.2vh,48px);height:clamp(40px,5.2vh,48px);border-radius:50%;border:0;background:#fff;font-size:clamp(18px,2.3vh,23px);cursor:pointer;box-shadow:0 3px 8px #0003;flex:none}
+.rb:hover{background:#fde68a}
+.btn{border:0;border-radius:14px;padding:10px 22px;font-weight:800;font-size:clamp(13.5px,1.8vh,17px);background:linear-gradient(#3b82f6,#2563eb);color:#fff;cursor:pointer;box-shadow:0 4px 0 #1e40af;font-family:inherit}
+.btn:active{transform:translateY(3px);box-shadow:0 1px 0 #1e40af}
+.btn.g{background:linear-gradient(#34d399,#059669);box-shadow:0 4px 0 #065f46}.btn.o{background:linear-gradient(#fbbf24,#f59e0b);box-shadow:0 4px 0 #b45309}.btn.r{background:linear-gradient(#f87171,#dc2626);box-shadow:0 4px 0 #991b1b}
+.card{background:rgba(255,255,255,.93);border-radius:20px;box-shadow:0 6px 16px #1e3a8a29;padding:clamp(10px,1.8vh,18px);min-height:0}
+.txt{font-size:calc(clamp(13px,1.65vh,16px)*var(--font-scale));font-weight:600;line-height:1.45}
+h3{margin:0 0 .5vh;font-size:calc(clamp(15px,2vh,20px)*var(--font-scale));font-weight:800;color:#1d4ed8}
+.ib{width:clamp(66px,9vh,88px);height:clamp(66px,9vh,88px);border-radius:22px;display:grid;place-items:center;font-size:clamp(34px,4.8vh,46px);flex:none;box-shadow:inset 0 -5px 0 #0002,0 4px 8px #0002}
+/* cover */
+#p1{align-items:center;justify-content:space-between;text-align:center}
+.cap{display:flex;align-items:center;gap:14px;background:#fff;border-radius:40px;padding:6px 22px;box-shadow:0 5px 14px #0003;font-weight:800}
+.cap img{height:clamp(50px,6.8vh,68px)}.bd{background:#fde68a;border-radius:20px;padding:3px 12px;font-size:.8em}
+.ttl{font-size:clamp(2.8rem,6.8vw,5.2rem);line-height:1.02;margin:0;font-weight:900;color:#1d4ed8;text-shadow:3px 3px 0 #fff,-3px -3px 0 #fff,3px -3px 0 #fff,-3px 3px 0 #fff,0 5px 0 #fff,5px 5px 0 #93c5fd}
+.sub{font-size:clamp(1.4rem,3.2vw,2.6rem);font-weight:900;color:#be185d;text-shadow:2px 2px 0 #fff,-2px -2px 0 #fff,2px -2px 0 #fff,-2px 2px 0 #fff;margin:0}
+.play{display:flex;align-items:center;gap:16px;border:0;background:none;cursor:pointer;font-family:inherit}
+.play i{width:clamp(60px,8.5vh,80px);height:clamp(60px,8.5vh,80px);border-radius:50%;background:linear-gradient(#34d399,#059669);color:#fff;display:grid;place-items:center;font-style:normal;font-size:clamp(26px,3.6vh,36px);animation:glow 1.6s infinite}
+.play b{font-size:clamp(24px,3.8vh,36px);color:#047857;text-shadow:2px 2px 0 #fff,-2px -2px 0 #fff,2px -2px 0 #fff,-2px 2px 0 #fff}
+@keyframes glow{0%,100%{box-shadow:0 0 0 0 #34d399aa}50%{box-shadow:0 0 0 22px #34d39900}}
+.foot{background:#fff;border-radius:30px;padding:6px 22px;font-weight:700;box-shadow:0 4px 10px #0002;font-size:clamp(13px,1.8vh,16px)}
+/* menu */
+.grid{flex:1;display:grid;gap:1.6vh;min-height:0}
+.mg{grid-template-columns:repeat(3,1fr);grid-template-rows:1fr 1fr}
+.mc{display:flex;align-items:center;gap:14px;text-align:left;border:0;font-family:inherit;cursor:pointer;background:rgba(255,255,255,.95);border-radius:22px;padding:12px 16px;box-shadow:0 6px 0 #93c5fd,0 8px 14px #0002;transition:.15s}
+.mc:hover{transform:translateY(-4px)}
+/* materi */
+.cg{grid-template-columns:repeat(3,1fr);grid-template-rows:1fr 1fr}
+.cc{display:flex;gap:12px;align-items:flex-start;overflow:hidden}
+/* sim */
+.simw{flex:1;display:flex;gap:1.4vh;min-height:0}
+#svgbox{flex:1;display:flex;flex-direction:column;min-width:0}
+svg.tree{width:100%;height:clamp(260px,38vh,420px);background:#fff;border-radius:16px}
+.flow{stroke-dasharray:10 6;animation:dash 1s linear infinite}@keyframes dash{to{stroke-dashoffset:-16}}
+.sel{animation:pulse 1s infinite;transform-origin:center;transform-box:fill-box}@keyframes pulse{50%{transform:scale(1.25)}}
+#side{width:32%;display:flex;flex-direction:column;gap:1vh}
+#tele div{display:flex;justify-content:space-between;border-bottom:1px dashed #cbd5e1;padding:.3vh 0}
+.bw{display:flex;flex-wrap:wrap;gap:8px}.bw .btn{padding:8px 12px;font-size:clamp(12px,1.6vh,15px)}
+/* eval */
+#ev{flex:1;display:flex;flex-direction:column;gap:1.4vh;justify-content:center;min-height:0}
+.opt{display:block;width:100%;text-align:left;margin:.7vh 0;padding:10px 22px;border-radius:14px;border:3px solid #bfdbfe;background:#fff;font-weight:700;font-size:clamp(13.5px,1.8vh,17px);cursor:pointer;font-family:inherit}
+.opt:hover{background:#eff6ff}.opt.ok{background:#bbf7d0;border-color:#16a34a}.opt.no{background:#fecaca;border-color:#dc2626}
+.mt{position:relative;display:flex;justify-content:space-between;gap:30%}
+.mt>div{flex:1;display:flex;flex-direction:column;gap:1.2vh}.mt .opt{margin:0;text-align:center}.mt .opt.on{background:#fde68a;border-color:#f59e0b}.mt .opt.done{background:#bbf7d0;border-color:#16a34a;pointer-events:none}
+.mt svg{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+.big{font-size:clamp(44px,6vh,60px);filter:drop-shadow(0 4px 4px #0004)}
+.trophy{font-size:clamp(50px,9vh,90px);animation:pulse 1.2s infinite;display:inline-block}
+/* profil */
+.prof{flex:1;display:flex;align-items:center;gap:4%;justify-content:center}
+.ph{width:clamp(130px,18vh,175px);height:clamp(130px,18vh,175px);border-radius:50%;padding:5px;background:linear-gradient(135deg,#2563eb,#ec4899,#f59e0b);filter:drop-shadow(0 6px 6px #0005);flex:none}
+.ph img{width:100%;height:100%;border-radius:50%;object-fit:cover;object-position:50% 20%;background:#e2e8f0;display:block;border:3px solid #fff}
+#modal{position:absolute;inset:0;background:#0006;display:none;place-items:center;z-index:9}#modal.on{display:grid}
+</style></head><body>
+<div id="stage-16-9">
+
+<section class="pg on" id="p1">
+ <div class="cap"><img src="logo-sekolah.png" alt="" onerror="this.style.display='none'"><div>SMP Negeri 1 Maduran<br><small>Dinas Pendidikan</small></div><span class="bd">Kurikulum Merdeka</span><span class="bd">Fase D</span></div>
+ <div><p class="sub" style="font-size:clamp(1rem,2vw,1.6rem);color:#047857">INFORMATIKA · KELAS IX</p>
+ <h1 class="ttl">Berpikir Komputasional</h1><p class="sub">dalam Analisis Data: Struktur Data Tree 🌳</p></div>
+ <button class="play" onclick="go(2)"><i>▶</i><b>MULAI</b></button>
+ <div class="foot">Media dikembangkan oleh <span id="gname"></span> · <span id="sname"></span> — “Belajar itu seru, berpikir itu hebat!”</div>
+</section>
+
+<section class="pg" id="p2">
+ <div class="bar"><div class="pill">🏠 Menu Utama Pembelajaran</div><button class="rb" title="Huruf lebih kecil" onclick="fs(-.1)">A-</button><button class="rb" title="Huruf lebih besar" onclick="fs(.1)">A+</button><button class="rb" id="snd" onclick="togSnd()">🔊</button><button class="rb" onclick="go(1)" title="Beranda">🏠</button></div>
+ <div class="grid mg" id="menu"></div>
+</section>
+
+<section class="pg" id="p3"></section>
+<section class="pg" id="p4"></section>
+
+<section class="pg" id="p5">
+ <div id="b5"></div>
+ <div class="simw">
+  <div id="svgbox"><svg class="tree" id="tsvg" viewBox="0 0 800 340" preserveAspectRatio="xMidYMid meet"></svg>
+   <div class="txt card" style="margin-top:1vh">💡 Klik simpul untuk memilihnya, lalu coba tambah anak, hapus, atau telusuri pohon.</div></div>
+  <div id="side"><div class="card txt" id="tele"></div>
+   <div class="card"><div class="bw">
+    <button class="btn g" onclick="addK()">➕ Tambah Anak</button><button class="btn r" onclick="delN()">🗑 Hapus</button>
+    <button class="btn o" onclick="trav('pre')">▶ Preorder</button><button class="btn o" onclick="trav('lvl')">▶ Level-order</button>
+    <button class="btn" onclick="initT();drawT()">↺ Reset</button></div>
+    <div class="txt" id="ord" style="margin-top:1vh;color:#be185d"></div></div></div>
+ </div>
+</section>
+
+<section class="pg" id="p6"><div id="b6"></div><div id="ev"></div></section>
+<section class="pg" id="p7"></section>
+
+<div id="modal" onclick="this.classList.remove('on')"><div class="card" style="width:60%;text-align:center" id="fact"></div></div>
+</div>
+
+<script>
+/* ===== DATA IDENTITAS (Bagian 1) ===== */
+const ID={mapel:'Informatika',kelas:'Fase D — IX',materi:'Berpikir Komputasional dalam Analisis Data',guru:'Moedhofir Afandi, S.Pd., MEI',sekolah:'SMP Negeri 1 Maduran',foto:'foto-guru.jpg'};
+const $=i=>document.getElementById(i);
+$('gname').textContent=ID.guru;$('sname').textContent=ID.sekolah;
+/* ===== SUARA (Web Audio) ===== */
+let on=true,AC;
+function tone(f,d,t='sine',at=0,f2){if(!on)return;AC=AC||new(window.AudioContext||window.webkitAudioContext)();const o=AC.createOscillator(),g=AC.createGain();o.type=t;const s=AC.currentTime+at;o.frequency.setValueAtTime(f,s);if(f2)o.frequency.linearRampToValueAtTime(f2,s+d);g.gain.setValueAtTime(.18,s);g.gain.exponentialRampToValueAtTime(.001,s+d);o.connect(g);g.connect(AC.destination);o.start(s);o.stop(s+d)}
+const sClick=()=>tone(450,.15,'sine',0,880),sOk=()=>[523,659,784].forEach((f,i)=>tone(f,.25,'triangle',i*.12)),sNo=()=>tone(160,.4,'sawtooth');
+function togSnd(){on=!on;$('snd').textContent=on?'🔊':'🔇';sClick()}
+let fsz=1;function fs(d){fsz=Math.min(1.4,Math.max(.8,fsz+d));$('stage-16-9').style.setProperty('--font-scale',fsz);sClick()}
+/* ===== NAVIGASI ===== */
+const bar=(t)=>`<div class="bar"><div class="pill">${t}</div><button class="rb" onclick="go(2)" title="Menu">⬅</button><button class="rb" onclick="go(1)" title="Beranda">🏠</button></div>`;
+function go(n){sClick();document.querySelectorAll('.pg').forEach((p,i)=>p.classList.toggle('on',i+1==n));if(n==5)drawT();if(n==6)ev(0)}
+/* ===== MENU ===== */
+const M=[['🎯','Tujuan Pembelajaran','Capaian & indikator kompetensi','#fecaca',3],['📖','Materi Pembelajaran','Konsep kunci Tree','#bfdbfe',4],['🕹️','Simulasi Tree','Laboratorium virtual interaktif','#bbf7d0',5],['📝','Evaluasi','3 babak · skor 100 poin','#fde68a',6],['👨‍🏫','Profil Guru','Fasilitator pembelajaran','#e9d5ff',7],['💡','Wawasan & Fakta','Fakta menarik tentang Tree','#fbcfe8',0]];
+$('menu').innerHTML=M.map(m=>`<button class="mc" onclick="${m[4]?`go(${m[4]})`:'fact()'}"><div class="ib" style="background:${m[3]}">${m[0]}</div><div><h3>${m[1]}</h3><div class="txt">${m[2]}</div></div></button>`).join('');
+/* ===== TP ===== */
+const TP=['Menjelaskan konsep hierarki data dan struktur data Tree (root, parent, child, leaf).','Mengidentifikasi contoh data hierarkis: struktur folder, bagan organisasi sekolah, dan silsilah.','Memodelkan data hierarkis menjadi diagram Tree dengan dekomposisi dan abstraksi.','Menentukan level, tinggi, serta jenis simpul pada sebuah Tree.','Menelusuri Tree dengan algoritma Preorder dan Level-order untuk menganalisis data.'];
+$('p3').innerHTML=bar('🎯 Tujuan Pembelajaran')+`<div class="card" style="flex:1;display:flex;flex-direction:column;justify-content:center;gap:1.4vh"><h3 style="text-align:center;font-size:clamp(16px,2.2vh,22px)">${ID.mapel} · ${ID.kelas} — ${ID.materi}</h3><div class="txt" style="text-align:center">Peserta didik mampu menganalisis dan memodelkan hierarki data menggunakan Struktur Data Tree. Indikatornya:</div>`+TP.map((t,i)=>`<div class="txt" style="display:flex;gap:12px;align-items:center;background:#eff6ff;border-radius:14px;padding:1vh 14px;font-size:calc(clamp(13.5px,1.9vh,16px)*var(--font-scale))"><span style="font-size:clamp(22px,3.2vh,32px)">${['🌱','📂','🧩','📏','🧭'][i]}</span>${t}</div>`).join('')+`</div>`;
+/* ===== MATERI ===== */
+const K=[['🌳','Struktur Data Tree','Tree menyimpan data secara hierarkis: satu simpul puncak bercabang ke simpul-simpul di bawahnya, seperti pohon terbalik.','#bbf7d0'],['👑','Root, Parent & Child','Root adalah simpul teratas. Parent (induk) punya Child (anak). Setiap simpul selain root hanya punya satu induk.','#fde68a'],['🍃','Leaf & Internal Node','Leaf (daun) adalah simpul tanpa anak. Simpul yang punya anak dan bukan root disebut internal node.','#a7f3d0'],['📏','Level & Tinggi','Level menunjukkan kedalaman simpul (root = level 0). Tinggi Tree adalah level terdalam yang ada.','#bfdbfe'],['🧭','Traversal','Preorder: induk dulu lalu anak-anaknya. Level-order: dikunjungi lapis demi lapis dari atas ke bawah.','#fbcfe8'],['🧠','Berpikir Komputasional','Dekomposisi memecah data, pengenalan pola mencari kesamaan, abstraksi menyederhanakan, algoritma menyusun langkah penelusuran.','#e9d5ff']];
+$('p4').innerHTML=bar('📖 Materi Pembelajaran')+`<div class="grid cg">`+K.map(k=>`<div class="card cc"><div class="ib" style="background:${k[3]}">${k[0]}</div><div><h3>${k[1]}</h3><div class="txt">${k[2]}</div></div></div>`).join('')+`</div>`;
+/* ===== SIMULASI TREE ===== */
+let T,sel,nid,vis=[],busy=0;
+function initT(){T=[{i:0,n:'SMPN 1 Maduran',p:null},{i:1,n:'Kelas VII',p:0},{i:2,n:'Kelas VIII',p:0},{i:3,n:'Kelas IX',p:0},{i:4,n:'IX-A',p:3},{i:5,n:'IX-B',p:3},{i:6,n:'VII-A',p:1}];sel=0;nid=7;vis=[];$('ord').textContent=''}
+const kids=i=>T.filter(x=>x.p===i),lvl=i=>{let d=0,x=T.find(t=>t.i==i);while(x.p!==null){x=T.find(t=>t.i==x.p);d++}return d};
+const ht=i=>{const k=kids(i);return k.length?1+Math.max(...k.map(c=>ht(c.i))):0};
+function drawT(){let lc=0,o={};const pos=(i,d)=>{const k=kids(i);let x;if(!k.length)x=lc++;else{const xs=k.map(c=>pos(c.i,d+1));x=(xs[0]+xs[xs.length-1])/2}o[i]={x,d};return x};pos(0,0);
+ const H=ht(0),st=Math.min(85,230/Math.max(H,1)),px=x=>lc>1?60+x*(680/(lc-1)):400,py=d=>38+d*st;let e='',n='';
+ T.forEach(t=>{if(t.p!==null)e+=`<line class="flow" x1="${px(o[t.p].x)}" y1="${py(o[t.p].d)}" x2="${px(o[t.i].x)}" y2="${py(o[t.i].d)}" stroke="#60a5fa" stroke-width="5" stroke-linecap="round"/>`});
+ T.forEach(t=>{const x=px(o[t.i].x),y=py(o[t.i].d),k=kids(t.i).length,c=t.p===null?'#f97316':k?'#2563eb':'#16a34a',vi=vis.indexOf(t.i),w=t.n.length*8.5+18;
+  n+=`<g data-i="${t.i}" style="cursor:pointer"><circle ${t.i==sel?'class="sel"':''} cx="${x}" cy="${y}" r="${t.i==sel?17:15}" fill="${vi>=0?'#ec4899':c}" stroke="${t.i==sel?'#facc15':'#fff'}" stroke-width="4"/>${vi>=0?`<text x="${x}" y="${y+5}" text-anchor="middle" fill="#fff" font-size="14" font-weight="800">${vi+1}</text>`:''}<rect x="${x-w/2}" y="${y+22}" width="${w}" height="24" rx="6" fill="#fff" stroke="${c}" stroke-width="1.5"/><text x="${x}" y="${y+39}" text-anchor="middle" font-size="13" font-weight="800" fill="#1e293b">${t.n}</text></g>`});
+ $('tsvg').innerHTML=e+n;$('tsvg').querySelectorAll('g').forEach(g=>g.onclick=()=>{if(busy)return;sel=+g.dataset.i;sClick();drawT()});
+ const s=T.find(t=>t.i==sel),k=kids(sel).length,par=s.p===null?'—':T.find(t=>t.i==s.p).n;
+ $('tele').innerHTML=`<h3>📡 Telemetri Simpul</h3><div><span>Simpul</span><b>${s.n}</b></div><div><span>Peran</span><b>${s.p===null?'Root':k?'Internal':'Leaf'}</b></div><div><span>Level</span><b>${lvl(sel)}</b></div><div><span>Induk</span><b>${par}</b></div><div><span>Jumlah anak</span><b>${k}</b></div><div><span>Tinggi subtree</span><b>${ht(sel)}</b></div><div><span>Total simpul / Tinggi Tree</span><b>${T.length} / ${H}</b></div>`}
+function addK(){if(busy)return;if(T.length>=12){sNo();$('ord').textContent='⚠ Maksimum 12 simpul.';return}T.push({i:nid,n:'Simpul '+nid,p:sel});nid++;vis=[];$('ord').textContent='';sOk();drawT()}
+function delN(){if(busy)return;if(sel===0){sNo();$('ord').textContent='⚠ Root tidak boleh dihapus.';return}const rm=new Set([sel]);let ch=1;while(ch){ch=0;T.forEach(t=>{if(rm.has(t.p)&&!rm.has(t.i)){rm.add(t.i);ch=1}})}const p=T.find(t=>t.i==sel).p;T=T.filter(t=>!rm.has(t.i));sel=p;vis=[];$('ord').textContent='';sClick();drawT()}
+function trav(m){if(busy)return;let r=[];if(m=='pre'){const f=i=>{r.push(i);kids(i).forEach(c=>f(c.i))};f(0)}else{let q=[0];while(q.length){const i=q.shift();r.push(i);kids(i).forEach(c=>q.push(c.i))}}
+ busy=1;vis=[];let k=0;const step=()=>{if(k>=r.length){busy=0;$('ord').innerHTML=(m=='pre'?'Preorder: ':'Level-order: ')+r.map(i=>T.find(t=>t.i==i).n).join(' → ');sOk();return}vis=r.slice(0,++k);tone(400+k*60,.2,'triangle');drawT();setTimeout(step,650)};step()}
+initT();
+$('b5').innerHTML=bar('🕹️ Laboratorium Virtual: Pohon Struktur Sekolah');
+/* ===== EVALUASI ===== */
+const MC=[['Simpul paling atas pada sebuah Tree disebut…',['Leaf','Root','Child','Level'],1],['Simpul yang tidak memiliki anak disebut…',['Leaf (daun)','Root','Parent','Edge'],0],['Contoh data hierarkis yang paling tepat dimodelkan dengan Tree adalah…',['Daftar belanja','Nilai rata-rata kelas','Struktur folder di komputer','Jadwal piket'],2]];
+const PR=[['Root','Simpul teratas tanpa induk'],['Leaf','Simpul tanpa anak'],['Parent','Simpul yang punya anak di bawahnya'],['Level','Kedalaman posisi simpul dari root']];
+const TF=[['Setiap simpul pada Tree boleh memiliki lebih dari satu induk.',0],['Struktur folder pada komputer adalah contoh data hierarkis.',1],['Penelusuran Preorder mengunjungi induk sebelum anak-anaknya.',1]];
+let SC=[0,0,0],qi=0,sl=null,mt=0,wr={};
+$('b6').innerHTML=bar('📝 Evaluasi Multi-Format (100 Poin)');
+function nxt(label,f){return `<div style="text-align:right"><button class="btn g" onclick="${f}">${label} ▶</button></div>`}
+function ev(s,q=0){const E=$('ev');
+ if(s==0){SC=[0,0,0];qi=0;s=1}
+ if(s==1){const m=MC[qi];E.innerHTML=`<div class="card"><h3>Babak A · Pilihan Ganda (${qi+1}/3) — 10 poin</h3><div class="txt" style="font-size:calc(clamp(15px,2vh,19px)*var(--font-scale))">${m[0]}</div>${m[1].map((o,i)=>`<button class="opt" onclick="ansA(${i},this)">${String.fromCharCode(65+i)}. ${o}</button>`).join('')}<div class="txt" id="fb"></div></div>`}
+ if(s==2){mt=0;sl=null;wr={};const ord=[2,0,3,1];E.innerHTML=`<div class="card"><h3>Babak B · Menjodohkan — 10 poin per pasangan</h3><div class="txt">Klik istilah di kiri, lalu klik definisinya di kanan.</div><div class="mt" id="mt"><div>${PR.map((p,i)=>`<button class="opt" data-l="${i}" onclick="pickL(${i},this)">${p[0]}</button>`).join('')}</div><div>${ord.map(i=>`<button class="opt" data-r="${i}" onclick="pickR(${i},this)">${PR[i][1]}</button>`).join('')}</div><svg id="ls"></svg></div><div class="txt" id="fb"></div></div>`}
+ if(s==3){qi=0;tf()}
+ if(s==4){const t=SC[0]+SC[1]+SC[2];E.innerHTML=`<div class="card" style="text-align:center"><div class="trophy">🏆</div><div style="font-size:clamp(34px,6vh,56px);font-weight:900;color:#1d4ed8">${t} / 100</div><div class="txt">Babak A: ${SC[0]}/30 · Babak B: ${SC[1]}/40 · Babak C: ${SC[2]}/30</div><div class="txt">${t>=80?'⭐⭐⭐ Luar biasa!':t>=60?'⭐⭐ Bagus, terus berlatih!':'⭐ Ayo pelajari materinya lagi!'}</div><br><button class="btn o" onclick="ev(0)">↺ Ulangi Evaluasi</button></div>`;sOk()}}
+function ansA(i,b){const m=MC[qi],bs=b.parentNode.querySelectorAll('.opt');bs.forEach(x=>x.disabled=1);bs[m[2]].classList.add('ok');if(i==m[2]){SC[0]+=10;sOk();$('fb').innerHTML='✅ Benar!'}else{b.classList.add('no');sNo();$('fb').innerHTML='❌ Kurang tepat.'}
+ $('fb').insertAdjacentHTML('afterend',nxt(qi<2?'Soal Berikutnya':'Lanjut ke Babak B',qi<2?'qi++;ev(1)':'ev(2)'))}
+function pickL(i,b){sClick();document.querySelectorAll('[data-l]').forEach(x=>x.classList.remove('on'));b.classList.add('on');sl=i}
+function pickR(i,b){if(sl===null)return;const l=document.querySelector(`[data-l="${sl}"]`),box=$('mt').getBoundingClientRect(),a=l.getBoundingClientRect(),c=b.getBoundingClientRect(),ok=sl==i;
+ const ln=document.createElementNS('http://www.w3.org/2000/svg','line');[['x1',a.right-box.left],['y1',a.top+a.height/2-box.top],['x2',c.left-box.left],['y2',c.top+c.height/2-box.top]].forEach(([k,v])=>ln.setAttribute(k,v));ln.setAttribute('stroke',ok?'#16a34a':'#dc2626');ln.setAttribute('stroke-width',5);ln.setAttribute('stroke-linecap','round');ln.setAttribute('class','flow');$('ls').appendChild(ln);
+ if(ok){l.classList.remove('on');l.classList.add('done');b.classList.add('done');if(!wr[i])SC[1]+=10;mt++;sOk();if(mt==4)$('fb').innerHTML='✅ Semua pasangan benar!'+nxt('Lanjut ke Babak C','ev(3)')}else{wr[sl]=1;sNo();setTimeout(()=>ln.remove(),700)}sl=null;document.querySelectorAll('[data-l]').forEach(x=>x.classList.remove('on'))}
+function tf(){const q=TF[qi];$('ev').innerHTML=`<div class="card"><h3>Babak C · Benar / Salah (${qi+1}/3) — 10 poin</h3><div class="txt" style="font-size:calc(clamp(15px,2vh,19px)*var(--font-scale));margin-bottom:1vh">${q[0]}</div><div style="display:flex;gap:14px"><button class="btn g" style="flex:1" onclick="ansC(1)">✓ BENAR</button><button class="btn r" style="flex:1" onclick="ansC(0)">✗ SALAH</button></div><div class="txt" id="fb" style="margin-top:1vh"></div></div>`}
+function ansC(v){document.querySelectorAll('#ev .btn').forEach(b=>b.disabled=1);const ok=v==TF[qi][1];if(ok){SC[2]+=10;sOk()}else sNo();$('fb').innerHTML=(ok?'✅ Tepat!':'❌ Kurang tepat. Jawaban: '+(TF[qi][1]?'BENAR':'SALAH'))+nxt(qi<2?'Soal Berikutnya':'Lihat Skor',qi<2?'qi++;tf()':'ev(4)')}
+/* ===== PROFIL ===== */
+$('p7').innerHTML=bar('👨‍🏫 Profil Guru Pengembang')+`<div class="prof"><div class="ph"><img src="${ID.foto}" alt="" onerror="this.style.display='none'"></div><div class="card" style="width:55%"><h3 style="font-size:clamp(20px,2.8vh,24px)">${ID.guru}</h3><div class="txt" style="font-size:calc(clamp(13px,1.9vh,15px)*var(--font-scale))">Guru ${ID.mapel}<br>${ID.sekolah}<br>Pengembang media: ${ID.materi}</div><div class="txt" style="margin-top:1.4vh;background:#fef9c3;border-radius:14px;padding:10px 14px">“Teknologi hanyalah alat; yang membuatnya bermakna adalah cara kita berpikir dan berbagi ilmu.”</div></div></div>`;
+/* ===== FAKTA ===== */
+const F=['Struktur folder di Windows, macOS, dan Linux adalah Tree: satu root dengan folder dan berkas bercabang di bawahnya.','HTML disusun sebagai Tree bernama DOM: elemen &lt;html&gt; adalah root, &lt;head&gt; dan &lt;body&gt; adalah anaknya.','Pohon keluarga dan bagan organisasi sekolah adalah contoh Tree dalam kehidupan sehari-hari.','Mesin pencari dan basis data memakai varian Tree agar pencarian data jutaan baris tetap cepat.'];let fi=0;
+function fact(){sClick();$('fact').innerHTML=`<div class="big">💡</div><h3>Tahukah kamu?</h3><div class="txt" style="font-size:calc(clamp(15px,2vh,19px)*var(--font-scale))">${F[fi%F.length]}</div><br><span class="txt">Klik di mana saja untuk menutup · fakta ${fi%F.length+1}/${F.length}</span>`;fi++;$('modal').classList.add('on')}
+</script></body></html>
